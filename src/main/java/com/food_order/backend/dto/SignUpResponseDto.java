@@ -9,6 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class SingUpResponseDto {
+public class SignUpResponseDto {
     private String email;
 }

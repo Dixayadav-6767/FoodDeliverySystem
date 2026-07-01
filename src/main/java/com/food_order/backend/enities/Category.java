@@ -1,17 +1,15 @@
 package com.food_order.backend.enities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "Category_table")
 @Getter
 @Setter
-@AllArgsConstructor
 @Builder
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Category {
 
     @Id

@@ -1,33 +1,31 @@
 package com.food_order.backend.enities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Builder
 @Table(name = "Item_Table")
 public class Items {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long ItemId;
+    Long id;
 
-    String ItemName;
+    String name;
 
-    String ItemDescription;
+    String description;
 
     @ManyToOne
     @JoinColumn(name = "category_id ")
-    Category Category;
+    Category category;
 
     Long price;
 
-    Boolean Is_available;
+    Boolean is_available;
 
 }

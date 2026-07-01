@@ -1,7 +1,9 @@
 package com.food_order.backend.services.implementation;
 
 import com.food_order.backend.Repositories.UserRepository;
+import com.food_order.backend.Security.JwtService;
 import com.food_order.backend.dto.LoginRequestDto;
+import com.food_order.backend.dto.LoginResponseDto;
 import com.food_order.backend.dto.SignUpRequestDto;
 import com.food_order.backend.enities.User;
 import com.food_order.backend.services.UserService;
@@ -21,10 +23,12 @@ import org.springframework.stereotype.Service;
 @Setter
 public class UserServiceImpl implements UserService {
 
-    @Autowired
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager manager;
+    private final JwtService jwtService;
+
 
     @Override
     public String singUp(SignUpRequestDto requestDto) throws RuntimeException {
@@ -41,16 +45,14 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    public String login(LoginRequestDto loginrequestDto) throws RuntimeException {
+    public LoginResponseDto login(LoginRequestDto loginrequestDto) throws RuntimeException {
 
         User user = userRepository.findByEmail(loginrequestDto.getEmail()).orElseThrow(null);
 
-          manager.authenticate(new UsernamePasswordAuthenticationToken(loginrequestDto.getEmail(), loginrequestDto.getPassword()));
+        manager.authenticate(new UsernamePasswordAuthenticationToken(loginrequestDto.getEmail(), loginrequestDto.getPassword()));
 
+        String token =  jwtService.GenerateToken(loginrequestDto.getEmail());
 
-
-
-
-        return "";
+        return LoginResponseDto.builder().Jwt(token).build();
     }
 }

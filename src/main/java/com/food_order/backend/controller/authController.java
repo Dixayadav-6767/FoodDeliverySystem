@@ -1,9 +1,6 @@
 package com.food_order.backend.controller;
 
-import com.food_order.backend.dto.LoginRequestDto;
-import com.food_order.backend.dto.LoginResponseDto;
-import com.food_order.backend.dto.SignUpRequestDto;
-import com.food_order.backend.dto.SignUpResponseDto;
+import com.food_order.backend.dto.*;
 import com.food_order.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,10 +21,15 @@ public class authController {
         return new ResponseEntity<>((SignUpResponseDto.builder().email(result).build()) , HttpStatus.OK);
     }
 
-    @PostMapping("/log-in")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponseDto<LoginResponseDto>> login(@RequestBody LoginRequestDto loginRequestDto){
+
+        LoginResponseDto result = userService.login(loginRequestDto);
 
 
+       ApiResponseDto response =  ApiResponseDto.<LoginResponseDto>builder().success(true).message("User Login Successfully").status(HttpStatus.OK.value()).data(result).build();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 

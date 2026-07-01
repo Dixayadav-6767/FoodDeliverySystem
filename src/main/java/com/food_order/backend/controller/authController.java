@@ -1,5 +1,7 @@
 package com.food_order.backend.controller;
 
+import com.food_order.backend.dto.LoginRequestDto;
+import com.food_order.backend.dto.LoginResponseDto;
 import com.food_order.backend.dto.SignUpRequestDto;
 import com.food_order.backend.dto.SignUpResponseDto;
 import com.food_order.backend.services.UserService;
@@ -20,6 +22,13 @@ public class authController {
     public ResponseEntity<SignUpResponseDto> signUp (@RequestBody SignUpRequestDto signUpRequestDto){
        String result =  userService.singUp(signUpRequestDto);
         return new ResponseEntity<>((SignUpResponseDto.builder().email(result).build()) , HttpStatus.OK);
+    }
+
+    @PostMapping("/log-in")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto){
+
+
+
     }
 
 }

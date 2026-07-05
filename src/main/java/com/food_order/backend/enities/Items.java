@@ -20,6 +20,8 @@ public class Items {
 
     String description;
 
+    String image;
+
     @ManyToOne
     @JoinColumn(name = "category_id ")
     Category category;

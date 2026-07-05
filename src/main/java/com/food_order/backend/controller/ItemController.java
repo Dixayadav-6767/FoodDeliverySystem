@@ -6,11 +6,10 @@ import com.food_order.backend.dto.CreateCategoryRequestDto;
 import com.food_order.backend.services.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,10 +18,10 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @PostMapping("/add-item")
-    public ResponseEntity<ApiResponseDto<Void>> addItem (@RequestBody AddItemRequestDto addItemRequestDto) {
+    @PostMapping(value = "/add-item" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseDto<Void>> addItem (@RequestPart("items") AddItemRequestDto addItemRequestDto ,@RequestPart("image") MultipartFile image) {
 
-        itemService.addItem(addItemRequestDto);
+        itemService.addItem(addItemRequestDto , image);
 
         ApiResponseDto<Void> response =  ApiResponseDto.<Void>builder()
                 .success(true)
@@ -32,6 +31,5 @@ public class ItemController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
 
 }

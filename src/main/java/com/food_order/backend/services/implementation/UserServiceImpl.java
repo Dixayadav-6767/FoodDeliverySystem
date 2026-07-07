@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     public LoginResponseDto login(LoginRequestDto loginrequestDto) throws RuntimeException {
 
-        User user = userRepository.findByEmail(loginrequestDto.getEmail()).orElseThrow(null);
+        User user = userRepository.findByEmail(loginrequestDto.getEmail()).orElse(null);
 
         manager.authenticate(new UsernamePasswordAuthenticationToken(loginrequestDto.getEmail(), loginrequestDto.getPassword()));
 

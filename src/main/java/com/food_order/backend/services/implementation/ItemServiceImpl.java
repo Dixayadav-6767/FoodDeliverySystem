@@ -2,10 +2,10 @@ package com.food_order.backend.services.implementation;
 
 import com.cloudinary.Cloudinary;
 import com.food_order.backend.Repositories.CategoryRepository;
-import com.food_order.backend.Repositories.ItemsRepository;
+import com.food_order.backend.Repositories.ItemRepository;
 import com.food_order.backend.dto.AddItemRequestDto;
 import com.food_order.backend.enities.Category;
-import com.food_order.backend.enities.Items;
+import com.food_order.backend.enities.Item;
 import com.food_order.backend.services.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemsRepository itemsRepository;
+    private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final Cloudinary cloudinary;
 
@@ -38,13 +38,13 @@ public class ItemServiceImpl implements ItemService {
         }
 
 
-        Items item = Items.builder()
+        Item item = Item.builder()
                 .name(addItemRequestDto.getItemName())
                 .description(addItemRequestDto.getItemDescription())
                 .image(imageUrl)
                 .category(category)
                 .price(addItemRequestDto.getPrice())
                 .build();
-        itemsRepository.save(item);
+        itemRepository.save(item);
     }
 }

@@ -5,7 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "User_table")
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor

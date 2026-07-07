@@ -1,4 +1,4 @@
 package com.food_order.backend.services;
 
-public interface CartitemService {
+public interface CartItemService {
 }

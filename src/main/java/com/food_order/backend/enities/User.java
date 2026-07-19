@@ -18,6 +18,7 @@ public class User {
     Long User_id;
     String name;
     String email;
+
 //    String phoneNo;
 //    String address;
 

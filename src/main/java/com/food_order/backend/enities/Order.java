@@ -3,6 +3,8 @@ package com.food_order.backend.enities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "order_table")
 @Getter
@@ -15,9 +17,16 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    Long User_id;
-    Long TotalPrice;
-    String OrderStatus;
-    String PaymentStatus;
-    String Address;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    User user;
+    Long totalPrice;
+    OrderStatus orderStatus;
+    String paymentStatus;
+    String address;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<OrderItem> orderItems;
+
 }

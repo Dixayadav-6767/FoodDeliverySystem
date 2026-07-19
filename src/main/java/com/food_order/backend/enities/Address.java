@@ -3,26 +3,31 @@ package com.food_order.backend.enities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
-
 @Entity
-@Table(name = "cart")
+@Table(name = "address")
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Setter
 @Getter
 @Builder
-public class Cart {
+public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "cart" , orphanRemoval = true)
-    private List<CartItem> cartItems;
+    private String state;
+
+    private String city;
+
+    private String country;
+
+    private String user_address;
+
+    private Long pincode;
+
 }

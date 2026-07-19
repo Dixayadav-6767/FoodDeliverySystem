@@ -29,59 +29,73 @@ public class CartServiceImpl implements CartService {
     public final CartItemRepository cartItemRepository;
 
     @Override
-//    public void addToCart(AddItemToCartRequestDto addItemToCartRequestDto){
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-//
-//        User user = userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("User not found"));
-//
-//        Cart cart = cartRepository.getByUser(user).orElse(Cart.builder().user(user).cartItems(null).build());
-//
-//        Item isItemExist = itemRepository.findById(addItemToCartRequestDto.getItemId()).orElseThrow(()-> new RuntimeException("Item Not Found to add in the cart"));
-//
-//        CartItem cartItem = CartItem.builder().cart(cart).quantity(Long.valueOf(addItemToCartRequestDto.getQuantity())).build();
-//
-//        CartItem savedCartItem =  cartItemRepository.save(cartItem);
-//        cart.getCartItems().add(savedCartItem);
-//
-//    }
-
     public void addToCart(AddItemToCartRequestDto addItemToCartRequestDto) {
 
-        // 1. Get current authenticated user
+        // STEP 1: Get the currently logged-in user's details
+        // SecurityContextHolder holds the details of who is logged into the application right now.
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        // Extract the email of the logged-in user from the authentication object
         String email = authentication.getName();
+        
+        // Search our database to find the full User object that matches this email
         User user = userRepository.findByEmail(email)
+                // If we can't find a user with this email, we throw an error immediately
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // 2. Fetch or Create & Save the Cart immediately to prevent transient errors
+        // STEP 2: Find the user's cart or create a new one if they don't have it yet
+        // We look for a cart that belongs to this specific user.
         Cart cart = cartRepository.getByUser(user).orElseGet(() -> {
+            // If they don't have a cart, we build a brand new empty cart for them
             Cart newCart = Cart.builder()
-                    .user(user)
-                    .cartItems(new ArrayList<>()) // 💡 Use an empty list, NEVER null
+                    .user(user) // Assign the cart to our logged-in user
+                    .cartItems(new ArrayList<>()) // Initialize with an empty list of items so we don't get a NullPointerException later
                     .build();
-            return cartRepository.save(newCart); // 💡 Save it to the DB right away
+            // We immediately save this new empty cart into our database and return it
+            return cartRepository.save(newCart); 
         });
 
-        // 3. Find the item to be added
+        // STEP 3: Find the specific item (food) they want to add to the cart
+        // The DTO (Data Transfer Object) from the frontend gives us the ID of the item they clicked on.
         Item item = itemRepository.findById(addItemToCartRequestDto.getItemId())
+                // If the item ID doesn't exist in our database, we throw an error
                 .orElseThrow(() -> new RuntimeException("Item Not Found to add in the cart"));
 
-        // 4. Create the new CartItem (Make sure to map the 'item' field too!)
-        CartItem cartItem = CartItem.builder()
-                .cart(cart)
-                .item(item) // 💡 Don't forget to attach the item itself!
-                .quantity(Long.valueOf(addItemToCartRequestDto.getQuantity()))
-                .build();
+        // STEP 4: Check if this exact item is ALREADY inside the user's cart
+        // We go through all the items currently in the cart and see if any of them match the item we just found.
+        CartItem existingCartItem = cart.getCartItems().stream()
+                // IMPORTANT: We compare the ID of the item in the cart with the ID of the new item being added
+                .filter((cartItem -> cartItem.getItem().getId().equals(item.getId())))
+                .findFirst() // Get the first match if it exists
+                .orElse(null); // If no match is found, return null
 
-        // 5. Save the child item
-        CartItem savedCartItem = cartItemRepository.save(cartItem);
+        // STEP 5: Add the item to the cart or update the quantity
+        if (existingCartItem != null) {
+            // SCENARIO A: The item is already in the cart!
+            // Instead of adding a duplicate row, we just increase the quantity of the existing one.
+            long additionalQuantity = Long.valueOf(addItemToCartRequestDto.getQuantity()); // Get how many more they want to add
+            existingCartItem.setQuantity(existingCartItem.getQuantity() + additionalQuantity); // Add the new quantity to the old quantity
 
-        // 6. Link to parent cart and save the parent cart
-        cart.getCartItems().add(savedCartItem);
-        cartRepository.save(cart); // 💡 Persist the relationship changes
+            // Save the updated existing item back to the database
+            cartItemRepository.save(existingCartItem);
+        } else {
+            // SCENARIO B: The item is NOT in the cart yet!
+            // We need to create a brand new CartItem object to link the Item, the Cart, and the Quantity.
+            CartItem cartItem = CartItem.builder()
+                    .cart(cart) // Link this item to the user's cart
+                    .item(item) // Link this to the actual food item
+                    .quantity(Long.valueOf(addItemToCartRequestDto.getQuantity())) // Set how many they ordered
+                    .build();
+                    
+            // Save this newly created CartItem into our database
+            CartItem savedCartItem = cartItemRepository.save(cartItem);
+            
+            // Finally, we add this saved CartItem to our cart's list of items
+            cart.getCartItems().add(savedCartItem);
+            
+            // Save the parent Cart so the database knows about this newly added item relationship
+            cartRepository.save(cart);
+        }
     }
-
 
 }
